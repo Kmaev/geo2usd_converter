@@ -14,8 +14,8 @@ class TextureResolve:
         "specular": "specular",
         "normal": "normal"
     })
-    mapping = {}
-    name_space = ""
+    mapping: dict[str, pathlib.Path] = field(default_factory=dict)
+    name_space: str = ""
 
 
 
