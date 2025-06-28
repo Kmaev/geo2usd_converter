@@ -32,6 +32,6 @@ if __name__ == "__main__":
 
 """
 Run the following command: Hython executable, path to the convert_usd.py file + --template_path + json file template
-/Applications/Houdini/Houdini20.5.410/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
+/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
   /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
   --template-path /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.json"""
