@@ -85,7 +85,7 @@ def populate_textures(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> N
     displacement_shader.CreateIdAttr("ND_displacement_float")
     displacement_shader_output = displacement_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
 
-    # if textures replacing default values with textures
+    # if textures -> replacing default values with textures
     for parm_name, tex_path in parms_mapping.items():
         uv_tex = UsdShade.Shader.Define(stage, f"{mat_path}/mtlx_{parm_name}")
         uv_tex.CreateIdAttr("ND_UsdUVTexture")
@@ -98,5 +98,4 @@ def populate_textures(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> N
     mat.CreateOutput("mtlx:surface", Sdf.ValueTypeNames.Token).ConnectToSource(surface_shader_output)
     mat.CreateOutput("mtlx:displacement", Sdf.ValueTypeNames.Token).ConnectToSource(displacement_shader_output)
     mat.CreateSurfaceOutput().ConnectToSource(surface_shader_output)
-    print(f"MAPPING: {parms_mapping}")
     return print(f"Material populated: {mat_path}")
