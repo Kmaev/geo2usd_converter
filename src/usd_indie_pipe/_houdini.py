@@ -1,12 +1,7 @@
 import json
 from pathlib import Path
-
+import _usd
 import hou
-
-"""
-This module explores one possible approach to recreating a usd file based on imported geometry.
-A very low-level method.
-"""
 
 
 def create_temp_hou_stage(file_path):
@@ -51,6 +46,8 @@ def create_temp_hou_stage(file_path):
         usd_rop.parm("execute").pressButton()
         print(f"Converted USD: {str(usd_file)}")
 
+        return usd_file
+
 
 def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) -> str:
     """
@@ -69,15 +66,17 @@ def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) ->
     return str(usd_path)
 
 
-def run_geo_to_usd_conversion(conversion_data: str):
+def run_geo_to_usd_conversion(conversion_data: str, tex_folder_path: str) -> None:
     """
      Runs geometry-to-usd conversion using a list of input geometry files provided in a json file.
 
     Parameters:
         conversion_data (str): Path to a json file containing a list of geometry file paths (e.g., .bgeo.sc, .obj).
+        tex_folder_path (str): Path to a folder containing tex files.
     """
     with open(conversion_data, "r") as r:
         conv_data = json.load(r)
     for file_path in conv_data:
         file_path = Path(file_path)
-        create_temp_hou_stage(file_path)
+        usd_file = create_temp_hou_stage(file_path)
+        _usd.run_material_assignment(usd_file, tex_folder_path)
