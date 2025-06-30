@@ -1,7 +1,9 @@
-import json
 from pathlib import Path
-import _usd
+
 import hou
+
+import _usd
+import _utils
 
 
 def create_temp_hou_stage(file_path):
@@ -13,6 +15,7 @@ def create_temp_hou_stage(file_path):
         raise FileNotFoundError(f"Could not find geometry file: {file_path}")
     else:
         # create Sop read
+        print(f"ASSET NAME: {asset_name}")
         sop_create = hou.node("/stage").createNode("sopcreate", asset_name)
         sop_create.parm("enable_partitionattribs").set(True)
         sop_create.parm("partitionattribs").set("path")
@@ -66,7 +69,7 @@ def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) ->
     return str(usd_path)
 
 
-def run_geo_to_usd_conversion(conversion_data: str, tex_folder_path: str) -> None:
+def run_geo_to_usd_conversion(asset_lib_path: str, lib_name=None, tex_folder_path=None) -> None:
     """
      Runs geometry-to-usd conversion using a list of input geometry files provided in a json file.
 
@@ -74,9 +77,9 @@ def run_geo_to_usd_conversion(conversion_data: str, tex_folder_path: str) -> Non
         conversion_data (str): Path to a json file containing a list of geometry file paths (e.g., .bgeo.sc, .obj).
         tex_folder_path (str): Path to a folder containing tex files.
     """
-    with open(conversion_data, "r") as r:
-        conv_data = json.load(r)
-    for file_path in conv_data:
+    conv_data = _utils.create_assets_dictionary(asset_lib_path, lib_name, tex_folder_path)
+    for file_path, tex_folder in conv_data.items():
         file_path = Path(file_path)
         usd_file = create_temp_hou_stage(file_path)
-        _usd.run_material_assignment(usd_file, tex_folder_path)
+
+        _usd.run_material_assignment(usd_file, str(tex_folder))
