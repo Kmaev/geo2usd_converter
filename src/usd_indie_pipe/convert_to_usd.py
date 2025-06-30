@@ -19,8 +19,8 @@ Example usage (Megascans):
 Example usage: Match geometry and texture folders independently of the library:
 /Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
   /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/geo \
-  --textures-folder-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/KB3DTextures/4k
+  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_match_by_folders/geo \
+  --textures-folder-path /Users/kmaev/Documents/hou_dev/assets/kb3d_match_by_folders/KB3DTextures/4k
 
 Example usage: No texture path or texture library provided
 (by default, the tool uses the file's folder as the texture folder):

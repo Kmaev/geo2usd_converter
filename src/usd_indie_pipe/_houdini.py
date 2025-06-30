@@ -58,7 +58,7 @@ def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) ->
     If separate_usd_folder is True, usd files will be put into usd subfolder.
     """
     clean_base = geo_path.name.split(".")[0]
-    usd_file_name = clean_base + ".usda"
+    usd_file_name = clean_base + ".usd"
 
     if separate_usd_folder:
         usd_dir = geo_path.parent / "usd"
