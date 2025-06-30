@@ -1,4 +1,4 @@
-from pxr import Usd, UsdShade, Kind, Sdf
+from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf
 
 from usd_indie_pipe.texture_resolve import TextureResolve
 
@@ -6,30 +6,41 @@ from usd_indie_pipe.texture_resolve import TextureResolve
 def create_material_prim(usd_stage: str, materials: list, tex_folder_path: str) -> Usd.Prim:
     stage = Usd.Stage.Open(usd_stage)
     subsets = get_subcomponents(stage)
-
     for prim in stage.Traverse():
         if not prim.IsValid() or not prim.IsDefined():
             continue
         if Usd.ModelAPI(prim).GetKind() == Kind.Tokens.component:
-            for mat in materials:
-                mat_lib_path = prim.GetPath().AppendPath("materials")
-                mat_lib_ = stage.DefinePrim(mat_lib_path, "Scope")
-                mat_path = mat_lib_path.AppendPath(mat)
+            mat_lib_path = prim.GetPath().AppendPath("materials")
+            mat_lib_ = stage.DefinePrim(mat_lib_path, "Scope")
 
-                mat_prim = UsdShade.Material.Define(stage, mat_path)
+            if subsets:
+                for mat in materials:
+                    mat_path = mat_lib_path.AppendPath(mat)
 
-                for sub_prim in subsets:
+                    mat_prim = UsdShade.Material.Define(stage, mat_path)
+                    for sub_prim in subsets:
 
-                    tex_name = sub_prim.GetName()
+                        tex_name = sub_prim.GetName()
 
-                    if mat == tex_name:
-                        UsdShade.MaterialBindingAPI.Apply(sub_prim).Bind(mat_prim)
-                        attr = sub_prim.GetAttribute("familyName")
-                        attr.Set("materialBind")
+                        if mat == tex_name:
+                            UsdShade.MaterialBindingAPI.Apply(sub_prim).Bind(mat_prim)
+                            attr = sub_prim.GetAttribute("familyName")
+                            attr.Set("materialBind")
 
-                        mapping = solve_texture(usd_stage, tex_name, tex_folder_path)
+                            mapping = solve_texture(usd_stage, tex_name, tex_folder_path)
 
-                        populate_textures(stage, mat_prim, mapping)
+                            populate_textures(stage, mat_prim, mapping)
+
+            else:
+                for child in prim.GetChildren():
+                    for sub_prim in Usd.PrimRange(child):
+                        if sub_prim.IsA(UsdGeom.Mesh):
+                            mesh_prim_name = sub_prim.GetName()
+                            mat_path = mat_lib_path.AppendPath(sub_prim.GetName())
+                            mat_prim = UsdShade.Material.Define(stage, mat_path)
+                            UsdShade.MaterialBindingAPI.Apply(sub_prim).Bind(mat_prim)
+                            mapping = solve_texture(usd_stage, mesh_prim_name, tex_folder_path)
+                            populate_textures(stage, mat_prim, mapping)
 
             stage.GetRootLayer().Save()
 
@@ -83,6 +94,7 @@ def populate_textures(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> N
     # add displacement
     displacement_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxdisplacement")
     displacement_shader.CreateIdAttr("ND_displacement_float")
+    displacement_shader.CreateInput("scale", Sdf.ValueTypeNames.Float).Set(0.0001)
     displacement_shader_output = displacement_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
 
     # if textures -> replacing default values with textures
@@ -92,7 +104,11 @@ def populate_textures(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> N
         uv_tex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set(Sdf.AssetPath(str(tex_path)))
         uv_tex.CreateOutput("rgb", Sdf.ValueTypeNames.Float3)
         rgb_output = uv_tex.CreateOutput("rgb", Sdf.ValueTypeNames.Float3)
-        surface_shader.CreateInput("base_color", Sdf.ValueTypeNames.Float3).ConnectToSource(rgb_output)
+        if parm_name == "displacement":
+            displacement_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(rgb_output)
+        else:
+            surface_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(rgb_output)
+        print(f"CREATED TEXTURE {parm_name} : {tex_path}")
         # Material outputs connecting to shader outputs
 
     mat.CreateOutput("mtlx:surface", Sdf.ValueTypeNames.Token).ConnectToSource(surface_shader_output)
