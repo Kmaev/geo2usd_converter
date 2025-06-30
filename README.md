@@ -3,7 +3,7 @@ USD Indie Pipeline is a pipeline setup (in development 😅)
 The idea is to create a starter kit with clean practices, tools, and just enough flexibility to grow with your projects.
 
 
-# Houdini to USD CLI tool:
+# Geo to USD CLI tool:
 
 Demo: https://vimeo.com/1097411468
 
