@@ -1,3 +1,33 @@
+"""
+Before running the command, make sure USD is installed in your environment.
+
+Run the following command: the Hython executable, followed by the path to the convert_usd.py file,
+then add the --asset-lib-path argument, and optionally: --lib-name and --textures-folder-path.
+
+Example usage (Kitbash):
+/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
+  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
+  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/ \
+  --lib-name Kitbash
+
+Example usage (Megascans):
+/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
+  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
+  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/megascans \
+  --lib-name Megascans
+
+Example usage: Match geometry and texture folders independently of the library:
+/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
+  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
+  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/geo \
+  --textures-folder-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/KB3DTextures/4k
+
+Example usage: No texture path or texture library provided
+(by default, the tool uses the file's folder as the texture folder):
+/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
+  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
+  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/megascans/japanese_gravestone_ucmmfjgfa_mid
+"""
 import argparse
 import importlib
 import sys
@@ -27,25 +57,7 @@ def main(args: list[str] | None = None):
         namespace.textures_folder_path,
     )
 
-
 if __name__ == "__main__":
     main()
 
-"""
-Before running the command, make sure USD is installed in your environment.
-Run the following command: the Hython executable, followed by the path to the convert_usd.py file,
-then add the --template_path argument, and optionally: --lib-name and --textures-folder_path.
 
-Example usage Kitbash
-/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
-  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/ \
-  --lib-name Kitbash
-  
-Example usage Megascans:
-/Applications/Houdini/Houdini20.5.613/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
-  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/src/usd_indie_pipe/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/megascans \
-  --lib-name Megascans
-
-"""

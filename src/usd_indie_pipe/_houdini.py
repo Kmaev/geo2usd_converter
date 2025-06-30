@@ -71,15 +71,21 @@ def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) ->
 
 def run_geo_to_usd_conversion(asset_lib_path: str, lib_name=None, tex_folder_path=None) -> None:
     """
-     Runs geometry-to-usd conversion using a list of input geometry files provided in a json file.
+    Runs geometry-to-USD conversion for all assets found in the given asset library path.
+
+    If a library name is provided, the texture folder will be automatically resolved based on
+    the expected folder structure of the specified library (currently supports Kitbash and Megascans).
+
+    If no library name is provided, you can optionally specify a texture folder directly.
+    If neither is provided, the tool will default to using the same folder as the geometry file.
 
     Parameters:
-        conversion_data (str): Path to a json file containing a list of geometry file paths (e.g., .bgeo.sc, .obj).
-        tex_folder_path (str): Path to a folder containing tex files.
+        asset_lib_path (str): Path to the asset library folder containing geometry files.
+        lib_name (str, optional): Optional library tag ("Kitbash" or "Megascans") to auto-resolve texture paths.
+        tex_folder_path (str, optional): Optional path to a folder containing texture files.
     """
     conv_data = _utils.create_assets_dictionary(asset_lib_path, lib_name, tex_folder_path)
     for file_path, tex_folder in conv_data.items():
         file_path = Path(file_path)
         usd_file = create_temp_hou_stage(file_path)
-
         _usd.run_material_assignment(usd_file, str(tex_folder))
