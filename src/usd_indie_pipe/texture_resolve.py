@@ -7,7 +7,7 @@ from usd_indie_pipe._utils import flatten_input_data
 @dataclass
 class TextureResolve:
     geometry_file: str
-    tex_folder_path: str = ""
+    tex_folder_path: str = None
     namespace: str = ""
 
     tex_conversion: dict[str, str] = field(default_factory=lambda: {
@@ -19,7 +19,7 @@ class TextureResolve:
     })
     mapping: dict[str, pathlib.Path] = field(default_factory=dict)
 
-    def parse_texture(self):
+    def parse_texture(self) -> dict:
         # we remove the first few characters just because we use asset name as a namespace, and sometimes it comes with prefixes
         name_space_edit = flatten_input_data(self.namespace)[5:]
 

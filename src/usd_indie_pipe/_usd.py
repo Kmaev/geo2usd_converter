@@ -78,10 +78,8 @@ def solve_texture(usd_file: str, namespace: str, tex_folder_path: str) -> dict:
 def run_material_assignment(usd_file: str, tex_folder_path: str) -> None:
     """
     Runs material creation and assignment for a USD stage.
-
     This function gathers all geometry subsets, determines material names,
     and calls the material creation and binding pipeline.
-
     """
     stage = Usd.Stage.Open(usd_file)
     subc = get_subsets(stage)
@@ -91,11 +89,9 @@ def run_material_assignment(usd_file: str, tex_folder_path: str) -> None:
 
 def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
     """
-    Populates a MaterialX surface and displacement shader with default parameters and textures.
-
+    Populates a materialX surface and displacement shader with default parameters and textures.
     For each texture entry in the parameter mapping, a UsdUVTexture is created and
     connected to the corresponding input on either the surface or displacement shader.
-
     """
     mat_path = mat.GetPath()
     surface_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxstandard_surface")  # define shader surface
@@ -134,9 +130,9 @@ def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
         else:
             surface_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(rgb_output)
         print(f"CREATED TEXTURE {parm_name} : {tex_path}")
-        # Material outputs connecting to shader outputs
 
+        # Material outputs connecting to shader outputs
     mat.CreateOutput("mtlx:surface", Sdf.ValueTypeNames.Token).ConnectToSource(surface_shader_output)
     mat.CreateOutput("mtlx:displacement", Sdf.ValueTypeNames.Token).ConnectToSource(displacement_shader_output)
     mat.CreateSurfaceOutput().ConnectToSource(surface_shader_output)
-    return print(f"Material populated: {mat_path}")
+    return print(f"MATERIAL POPULATED: {mat_path}")

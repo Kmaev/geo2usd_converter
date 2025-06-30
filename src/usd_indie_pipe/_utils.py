@@ -5,7 +5,7 @@ from pathlib import Path
 def flatten_input_data(data_str: str) -> str:
     """
     Removes all non-alphanumeric characters and converts the string to lowercase.
-    Used for matching texture and primitives.
+    Used for matching texture and primitives in usd stage.
     """
     return re.sub(r'[^a-zA-Z0-9]', '', data_str).lower()
 
@@ -13,9 +13,7 @@ def flatten_input_data(data_str: str) -> str:
 def create_assets_dictionary(asset_lib_path: str, lib_name=None, tex_folder_path=None) -> dict:
     """
     Builds a dictionary mapping geometry files to their corresponding texture folders.
-
     The mapping strategy varies depending on whether a known library type or an explicit texture folder path is provided.
-
     Supported cases:
     - Libraries: "Kitbash", "Megascans"
     - Matching a folder of assets to a separate texture folder
@@ -54,7 +52,7 @@ def create_assets_dictionary(asset_lib_path: str, lib_name=None, tex_folder_path
 
         elif lib_name == "Megascans":
             for asset in lib_path.iterdir():
-                geo_folder = asset  # asset is already a Path
+                geo_folder = asset
                 if geo_folder.is_dir():
                     for geo_file in geo_folder.iterdir():
                         if geo_file.is_file() and any(

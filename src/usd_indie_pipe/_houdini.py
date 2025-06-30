@@ -47,7 +47,7 @@ def create_temp_hou_stage(file_path):
 
         # Execute save usd file
         usd_rop.parm("execute").pressButton()
-        print(f"Converted USD: {str(usd_file)}")
+        print(f"CONVERTED USD: {str(usd_file)}")
 
         return usd_file
 
@@ -71,18 +71,13 @@ def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) ->
 
 def run_geo_to_usd_conversion(asset_lib_path: str, lib_name=None, tex_folder_path=None) -> None:
     """
-    Runs geometry-to-USD conversion for all assets found in the given asset library path.
+    Runs geometry-to-usd conversion for all assets found in the given asset library path.
 
     If a library name is provided, the texture folder will be automatically resolved based on
     the expected folder structure of the specified library (currently supports Kitbash and Megascans).
 
     If no library name is provided, you can optionally specify a texture folder directly.
     If neither is provided, the tool will default to using the same folder as the geometry file.
-
-    Parameters:
-        asset_lib_path (str): Path to the asset library folder containing geometry files.
-        lib_name (str, optional): Optional library tag ("Kitbash" or "Megascans") to auto-resolve texture paths.
-        tex_folder_path (str, optional): Optional path to a folder containing texture files.
     """
     conv_data = _utils.create_assets_dictionary(asset_lib_path, lib_name, tex_folder_path)
     for file_path, tex_folder in conv_data.items():
