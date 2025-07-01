@@ -23,7 +23,7 @@ Run the following command:
 hython /path/to/hython \
     /path/to/convert_to_usd.py \
     --asset-lib-path /path/to/your/geometry \
-    --lib-name Kitbash] \
+    --lib-name Kitbash \
     --textures-folder-path /path/to/textures
     
 
@@ -55,7 +55,9 @@ Example: Kitbash default folder structure
 <img width="768" alt="image" src="https://github.com/user-attachments/assets/1369e52a-7921-4e6f-a0d2-80a999bde188" />
 
 
-Example usage: Match geometry and texture folders independently of the library:
+Example usage: 
+
+Match geometry and texture folders independently of the library:
 
 <img width="926" alt="image" src="https://github.com/user-attachments/assets/2ceddd47-8d63-42ae-a063-da2b38b11567" />
 
