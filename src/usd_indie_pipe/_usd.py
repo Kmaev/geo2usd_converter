@@ -26,6 +26,11 @@ def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: 
 
                     mat_prim = UsdShade.Material.Define(stage, mat_path)
                     for sub_prim in subsets:
+                        gprim = stage.GetPrimAtPath(sub_prim.GetPath().GetParentPath())
+                        if gprim.IsA(UsdGeom.Gprim):
+                            gprim = UsdGeom.Gprim(gprim)
+                            gprim.CreateDisplayColorAttr().Set([(0.8, 0.8, 0.8)])
+                            gprim.CreateDisplayOpacityAttr().Set([1.0])
 
                         tex_name = sub_prim.GetName()
 
@@ -33,8 +38,12 @@ def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: 
                             UsdShade.MaterialBindingAPI.Apply(sub_prim).Bind(mat_prim)
                             attr = sub_prim.GetAttribute("familyName")
                             attr.Set("materialBind")
+
                             mapping = solve_texture(usd_stage, tex_name, tex_folder_path)
                             populate_mtlx(stage, mat_prim, mapping)
+
+
+
 
             else:
                 for child in prim.GetChildren():
@@ -93,11 +102,22 @@ def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
     For each texture entry in the parameter mapping, a UsdUVTexture is created and
     connected to the corresponding input on either the surface or displacement shader.
     """
-    mat_path = mat.GetPath()
-    surface_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxstandard_surface")  # define shader surface
-    surface_shader.CreateIdAttr("ND_standard_surface_surfaceshader")
 
-    # default_values:
+    mat_path = mat.GetPath()
+
+    # Init Mtlx standart surface shader
+    surface_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxstandard_surface")
+    surface_shader.CreateIdAttr("ND_standard_surface_surfaceshader")
+    surface_shader_output = surface_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
+
+    # Init Preview shader, it will be defaulted to [0.8, 0.8, 0.8] base color
+    preview_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxstandard_preview")
+    preview_shader.CreateIdAttr("UsdPreviewSurface")
+    preview_shader.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(
+        (0.8, 0.8, 0.8))
+    preview_output = preview_shader.CreateOutput("surface", Sdf.ValueTypeNames.Token)
+
+    # Mtlx surface shader parms definition
     surface_shader.CreateInput("base", Sdf.ValueTypeNames.Float).Set(1.0)
     surface_shader.CreateInput("coat", Sdf.ValueTypeNames.Float).Set(0.0)
     surface_shader.CreateInput("coat_roughness", Sdf.ValueTypeNames.Float).Set(0.1)
@@ -109,30 +129,32 @@ def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
     surface_shader.CreateInput("specular_IOR", Sdf.ValueTypeNames.Float).Set(1.5)
     surface_shader.CreateInput("specular_roughness", Sdf.ValueTypeNames.Float).Set(0.2)
     surface_shader.CreateInput("transmission", Sdf.ValueTypeNames.Float).Set(0.0)
-    surface_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
-    surface_shader_output = surface_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
 
-    # add displacement
+    # Init Displacement shader
     displacement_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxdisplacement")
     displacement_shader.CreateIdAttr("ND_displacement_float")
     displacement_shader.CreateInput("scale", Sdf.ValueTypeNames.Float).Set(0.0001)
     displacement_shader_output = displacement_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
 
-    # if textures -> replacing default values with textures
+    # If textures available creating textures
     for parm_name, tex_path in parms_mapping.items():
         uv_tex = UsdShade.Shader.Define(stage, f"{mat_path}/mtlx_{parm_name}")
-        uv_tex.CreateIdAttr("ND_UsdUVTexture")
+        uv_tex.CreateIdAttr("UsdUVTexture")
         uv_tex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set(Sdf.AssetPath(str(tex_path)))
-        uv_tex.CreateOutput("rgb", Sdf.ValueTypeNames.Float3)
-        rgb_output = uv_tex.CreateOutput("rgb", Sdf.ValueTypeNames.Float3)
+        uv_tex_output = uv_tex.CreateOutput("rgb", Sdf.ValueTypeNames.Color3f)
+
+        # Shader connections
         if parm_name == "displacement":
-            displacement_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(rgb_output)
+            displacement_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(uv_tex_output)
         else:
-            surface_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(rgb_output)
+            surface_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(uv_tex_output)
+
         print(f"CREATED TEXTURE {parm_name} : {tex_path}")
 
-        # Material outputs connecting to shader outputs
+    # Connection to materila output
     mat.CreateOutput("mtlx:surface", Sdf.ValueTypeNames.Token).ConnectToSource(surface_shader_output)
     mat.CreateOutput("mtlx:displacement", Sdf.ValueTypeNames.Token).ConnectToSource(displacement_shader_output)
+    mat.CreateOutput("surface", Sdf.ValueTypeNames.Token).ConnectToSource(preview_output)
     mat.CreateSurfaceOutput().ConnectToSource(surface_shader_output)
-    return print(f"MATERIAL POPULATED: {mat_path}")
+
+    print(f"MATERIAL POPULATED: {mat_path}")
