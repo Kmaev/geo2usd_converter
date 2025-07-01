@@ -15,7 +15,8 @@ class TextureResolve:
         "specular": "specular",
         "emission": "emissive",
         "displacement": "height",
-        "specular_roughness": "roughness"
+        "specular_roughness": "roughness",
+        "opacity": "opacity"
     })
     mapping: dict[str, pathlib.Path] = field(default_factory=dict)
 
