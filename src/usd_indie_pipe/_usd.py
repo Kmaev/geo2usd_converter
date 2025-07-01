@@ -42,9 +42,6 @@ def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: 
                             mapping = solve_texture(usd_stage, tex_name, tex_folder_path)
                             populate_mtlx(stage, mat_prim, mapping)
 
-
-
-
             else:
                 for child in prim.GetChildren():
                     for sub_prim in Usd.PrimRange(child):
