@@ -1,5 +1,10 @@
-from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf
+import os
+import shutil
+from pathlib import Path
 
+from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf, UsdUtils
+
+from usd_indie_pipe.asset_resolve import LayerReplacer
 from usd_indie_pipe.texture_resolve import TextureResolve
 
 
@@ -155,3 +160,83 @@ def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
     mat.CreateSurfaceOutput().ConnectToSource(surface_shader_output)
 
     print(f"MATERIAL POPULATED: {mat_path}")
+
+
+# __________________________________________________
+# ASSET RESOLVE
+"""
+All asset resolve paths are in active development; the workflow and asset handling are still being defined.
+"""
+
+
+def get_version(path: str):
+    """
+    Temp version handling.
+    """
+    usd_file_path = Path(path)
+    version = usd_file_path.parent.name.strip("v")
+    return version
+
+
+def version_up(stage_path: str):
+    """
+    Increase the version of usd stage
+    """
+    version = get_version(stage_path)
+    new_version = str(int(version) + 1).zfill(len(version))
+    return new_version
+
+
+def create_versioned_up_file_copy(stage_path: str):
+    """
+    Creates a versioned-up copy of the usd stage. This version of the file will be adjusted based on the latest
+    updates to its dependencies
+    """
+    old_version = get_version(stage_path)
+    new_version = version_up(old_version)
+    new_stage_path = Path(stage_path.replace(old_version, new_version))
+    orig_stage_path = Path(stage_path)
+    new_version_dir = new_stage_path.parent
+
+    if not new_version_dir.exists():
+        os.makedirs(new_version_dir)
+
+    shutil.copy(orig_stage_path, new_stage_path)
+    return str(new_stage_path)
+
+
+def parse_shot_manifest(stage_path: str, old_path: str, new_path: str):
+    """
+    Handles adjustments to the dependencies in the USD stage.
+    """
+    new_stage_path = create_versioned_up_file_copy(stage_path)
+    stage = Usd.Stage.Open(new_stage_path)
+    root_layer = stage.GetRootLayer()
+    layers = root_layer.subLayerPaths
+
+    if old_path in layers:
+        UsdUtils.ModifyAssetPaths(
+            root_layer,
+            LayerReplacer(
+                old_path=old_path,
+                new_path=new_path,
+            ),
+        )
+        stage.Save()
+
+
+# __________________________________________________
+# USD STAGE LOADING AND PUBLISING
+
+
+def get_layer_composition(stage_path: str):
+    """
+    Returns all dependencies of the usd stage.
+    """
+    stage = Usd.Stage.Open(stage_path)
+    usd_layer = stage.GetRootLayer()
+    all_layers, _, _ = UsdUtils.ComputeAllDependencies(usd_layer.identifier)
+    layers = []
+    for layer in all_layers:
+        layers.append(layer.identifier)
+    return layers
