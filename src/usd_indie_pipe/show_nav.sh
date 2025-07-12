@@ -1,38 +1,35 @@
 #!/bin/bash
 
-export PROJECTS_ROOT="/Users/kmaev/Documents/hou_dev/houdini_scenes/Projects"
+# Root directory for all projects
+export PR_ROOT="/Users/kmaev/Documents/hou_dev/houdini_scenes/Projects"
 
+# Load project-specific environment
 load() {
-    export SHOW=$1
-    export REALM=$2
-    export SHOW_ROOT="$PROJECTS_ROOT/$SHOW/$REALM"
+    export PR_SHOW="$1"
+    export PR_SHOW_ROOT="$PR_ROOT/$PR_SHOW"
+    echo "[DEBUG] PR_ROOT=$PR_ROOT"
+    echo "[DEBUG] PR_SHOW=$PR_SHOW"
+    echo "[DEBUG] PR_SHOW_ROOT=$PR_SHOW_ROOT"
 
-    local show_env="$PROJECTS_ROOT/$SHOW/utils/show.env"
-    if [[ -f "$show_env" ]]; then
-        set -a
-        source "$show_env"
-        set +a
-        echo "[INFO] Loaded context: SHOW=$SHOW, REALM=$REALM"
-    else
-        echo "[WARNING] No show.env found for: $SHOW"
-    fi
+
+    #local show_env="$PR_SHOW_ROOT/utils/show.env"
+    #if [[ -f "$show_env" ]]; then
+    #    set -a
+    #    source "$show_env"
+    #    set +a
+    #    echo "[INFO] Loaded context: PR_SHOW=$PR_SHOW"
+    #else
+    #    echo "[WARNING] No show.env found for: $PR_SHOW"
+    #fi
 }
 
+# Navigate to a task folder
 cdtask() {
-    local path=""
+    export PR_GROUP="$1"
+    export PR_ITEM="$2"
+    export PR_TASK="$3"
 
-    if [[ "$REALM" == "shots" ]]; then
-        export SEQUENCE=$1
-        export SHOT=$2
-        export TASK=$3
-        export SUBTASK=$4
-        path="$SHOW_ROOT/$REALM/$SEQUENCE/$SHOT/$TASK/$SUBTASK"
-    else
-        export ASSET_NAME=$1
-        export TASK=$2
-        export SUBTASK=$3
-        path="$SHOW_ROOT/$REALM/$ASSET_NAME/$TASK/$SUBTASK"
-    fi
+    local path="$PR_SHOW_ROOT/$PR_GROUP/$PR_ITEM/$PR_TASK"
 
     if [[ -d "$path" ]]; then
         cd "$path" || {
@@ -46,8 +43,9 @@ cdtask() {
     fi
 }
 
+# Launch Houdini Indie
 houdini() {
-    local houdini_app="/Applications/Houdini/Houdini20.5.613/Houdini Indie 20.5.613.app"
+    local houdini_app="/Applications/Houdini/Houdini20.5.653/Houdini Indie 20.5.653.app"
 
     if [[ ! -d "$houdini_app" ]]; then
         echo "[ERROR] Houdini app not found at: $houdini_app"
@@ -55,11 +53,18 @@ houdini() {
     fi
 
     echo "[INFO] Launching Houdini with:"
-    if [[ "$REALM" == "shots" ]]; then
-        echo "  SHOW=$SHOW | REALM=$REALM | SEQUENCE=$SEQUENCE | SHOT=$SHOT | TASK=$TASK | SUBTASK=$SUBTASK"
-    else
-        echo "  SHOW=$SHOW | REALM=$REALM | ASSET=$ASSET_NAME | TASK=$TASK | SUBTASK=$SUBTASK"
-    fi
+    echo "       PR_SHOW=$PR_SHOW | GROUP=$PR_GROUP | ITEM=$PR_ITEM | TASK=$PR_TASK"
 
     open -a "$houdini_app"
+}
+
+# Launch PyCharm
+pycharm() {
+    local pycharm_app="/Applications/PyCharm.app"
+    if [[ -d "$pycharm_app" ]]; then
+        open -a "$pycharm_app"
+    else
+        echo "[ERROR] PyCharm not found at: $pycharm_app"
+        return 1
+    fi
 }
