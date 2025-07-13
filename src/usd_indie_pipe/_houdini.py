@@ -1,9 +1,12 @@
+import json
+import os
+import re
 from pathlib import Path
 
 import hou
 
-import _usd
-import _utils
+from usd_indie_pipe import _usd
+from usd_indie_pipe import _utils
 
 
 def create_temp_hou_stage(file_path):
@@ -84,3 +87,86 @@ def run_geo_to_usd_conversion(asset_lib_path: str, lib_name=None, tex_folder_pat
         file_path = Path(file_path)
         usd_file = create_temp_hou_stage(file_path)
         _usd.run_material_assignment(usd_file, str(tex_folder))
+
+
+def get_path_structure_templ(template: str) -> str | None:
+    """
+    Imports the template to solve the usd file output path
+    """
+    json_path = Path(__file__).parent / "folder_structure.json"
+    with open(json_path) as f:
+        folder_structure = json.load(f)
+    templ = folder_structure[template]
+    return templ
+
+
+def get_latest_version(context: str) -> int | None:
+    """
+    Solves the latest version of the usd scene and returns the latest version number.
+    """
+    context_path = Path(context)
+    if context_path.exists():
+        versioned_dirs = []
+        for d in context_path.iterdir():
+
+            match = re.search(r'\d+', d.name)
+            if match:
+                versioned_dirs.append(int(match.group()))
+        latest_version = sorted(versioned_dirs, reverse=True)[0]
+        return latest_version
+    return None
+
+
+def get_usd_output_path(node: hou.Node) -> str:
+    """
+    Solves the usd output file path using environment variables and the selected template.
+    """
+    pr_root = os.environ.get("PR_ROOT")
+    show = os.environ.get("PR_SHOW")
+    if not pr_root or not show:
+        raise RuntimeError("Missing PR_ROOT or PR_SHOW environment variables.")
+
+    # Gather node parameters
+    template = node.parm("templ").evalAsString()
+    grp = node.parm("grp").evalAsString()
+    item = node.parm("item").evalAsString()
+    task = node.parm("task").evalAsString()
+    file_format = node.parm("format").evalAsString()
+    name = node.parm("name").eval()
+    padding = ".$F4" if node.evalParm("trange") else ""
+
+    # Resolve template
+    templ_dir, templ_version = get_path_structure_templ(template)
+
+    if template == "usd_task_output":
+        base_output = templ_dir.format(
+            pr_root=pr_root, pr_show=show, pr_group=grp,
+            pr_item=item, pr_task=task, name=name
+        )
+
+        # Auto versioning
+        if node.parm("autoversion").eval():
+            version = get_latest_version(base_output)
+            version = version + 1 if version else 1
+            node.parm("version").set(version)
+        else:
+            version = int(node.parm("version").eval())
+
+    elif template == "usd_main_output":
+        base_output = templ_dir.format(
+            pr_root=pr_root, pr_show=show, pr_group=grp,
+            pr_item=item, pr_task=task
+        )
+        version = get_latest_version(base_output)
+        version = version if version else 1
+
+    else:
+        raise ValueError(f"Unsupported template type: {template}")
+
+    # Parsing the second part of the output path string (everything that goes after version folder)
+    version_str = str(version).zfill(3)
+    version_dir = templ_version.format(
+        name=name, version=version_str, padding=padding, format=file_format
+    )
+
+    return str(os.path.join(base_output, version_dir))
