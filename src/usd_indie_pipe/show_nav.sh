@@ -2,6 +2,7 @@
 
 # Root directory for all projects
 export PR_ROOT="/Users/kmaev/Documents/hou_dev/houdini_scenes/Projects"
+export PYTHONPATH="/Users/kmaev/Documents/hou_dev/usd_indie_pipe/src:$PYTHONPATH"
 
 # Load project-specific environment
 load() {
