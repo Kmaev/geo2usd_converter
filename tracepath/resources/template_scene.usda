@@ -1,0 +1,38 @@
+#usda 1.0
+
+def Scope "main"
+{
+    def Scope "ASSETS"
+    {
+        def Scope "Cre"
+        {
+        }
+
+        def Scope "Env"
+        {
+        }
+    }
+
+    def Scope "SHOT"
+    {
+        def Xform "Env"
+        {
+            def Xform "geom"
+            {
+            }
+
+            def Xform "dressing"
+            {
+            }
+        }
+
+        def Xform "cameras"
+        {
+        }
+
+        def Xform "lights"
+        {
+        }
+    }
+}
+
