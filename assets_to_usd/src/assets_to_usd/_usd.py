@@ -1,6 +1,6 @@
 from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf
 
-from usd_indie_pipe.texture_resolve import TextureResolve
+from assets_to_usd.texture_resolve import TextureResolve
 
 
 def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: str) -> Usd.Prim:
