@@ -1,7 +1,7 @@
 import pathlib
 from dataclasses import dataclass, field
 
-from usd_indie_pipe._utils import flatten_input_data
+from assets_to_usd._utils import flatten_input_data
 
 
 @dataclass
