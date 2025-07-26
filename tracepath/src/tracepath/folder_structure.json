@@ -1,8 +1,0 @@
-{
-    "usd_task_output": "{pr_root}/{pr_show}/{pr_group}/{pr_item}/{pr_task}/main/{name}/v{version}/{name}_v{version}{padding}{file_format}",
-    "usd_shot_manifest_output": [
-        "{pr_root}/{pr_show}/{pr_group}/{pr_item}/main/",
-        "v{version}/main_v{version}{file_format}"
-    ],
-    "usd_combined_output": "{pr_root}/{pr_show}/{pr_group}/{pr_item}/{pr_task}/main/{name}/v{version}/combined/{name}_combined{file_format}"
-}
