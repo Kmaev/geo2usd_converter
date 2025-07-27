@@ -12,7 +12,7 @@ def get_env() -> dict:
     Gets environment variables for path resolution.
     """
     env_data = {
-        "pr_root": os.getenv("PR_ROOT"),
+        "pr_projects_path": os.getenv("PR_PROJECTS_PATH"),
         "pr_show": os.getenv("PR_SHOW")
     }
     return env_data
@@ -217,7 +217,7 @@ def get_data_folder() -> Path:
     Helper function to get the data folder.
     """
     env_vars = get_env()
-    return Path(env_vars["pr_root"]) / env_vars["pr_show"] / "show_data"
+    return Path(env_vars["pr_projects_path"]) / env_vars["pr_show"] / "show_data"
 
 
 def get_publish_key(node: hou.Node) -> str:
