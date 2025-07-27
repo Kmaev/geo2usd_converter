@@ -1,12 +1,10 @@
-echo "[TRACEPATH_INDIE] show_nav.sh sourced successfully"
+echo "[TRACEPATH] show_nav.sh sourced successfully"
 
-# Load project-specific environment
 load() {
     export PR_SHOW="$1"
-    export PR_SHOW_ROOT="$PR_ROOT/$PR_SHOW"
-    echo "[DEBUG] PR_ROOT=$PR_ROOT"
+
+    export PR_SHOW_ROOT="$PR_PROJECTS_PATH/$PR_SHOW"
     echo "[DEBUG] PR_SHOW=$PR_SHOW"
-    echo "[DEBUG] PR_SHOW_ROOT=$PR_SHOW_ROOT"
 }
 
 cdtask() {
