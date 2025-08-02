@@ -1,0 +1,35 @@
+{
+    "MyProjectExample": {
+        "groups": {
+            "MyGroupExample": {
+                "items": {
+                    "MyItemExample": {
+                        "tasks": {
+                            "MyTaskExample": {}
+                        }
+                    }
+                }
+            },
+            "seq1": {
+                "items": {
+                    "sh0010": {
+                        "tasks": {
+                            "env_library": {},
+                            "fx_library_destruction": {}
+                        }
+                    }
+                }
+            },
+            "Assets": {
+                "items": {
+                    "mr_pig": {
+                        "tasks": {
+                            "Modelling": {},
+                            "Grooming": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

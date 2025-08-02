@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="icons">
+        <file alias="chevron-down">icons/chevron-down.png</file>
+        <file alias="chevron-right">icons/chevron-right.png</file>
+    </qresource>
+</RCC>
