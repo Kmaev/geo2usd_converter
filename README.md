@@ -6,6 +6,10 @@ Demo: https://vimeo.com/1097411468
 A CLI tool that converts geometry files (e.g., .bgeo.sc, .fbx) into .usd format.
 It parses textures based on a library name (currently supported: Kitbash, Megascans) or from a specified texture folder, creates MaterialX shaders populated with the corresponding textures, and automatically binds materials to USD primitives.
 
+Note: This is my second solution to the problem.
+The original approach relied heavily on Houdini — you can find it here: [Kmaev/houdini_geo2usd_converter.](https://github.com/Kmaev/houdini_geo2usd_converter)
+In contrast, this version uses Houdini only briefly and instead relies primarily on the USD API.
+
 Requirements
 
 USD must be installed in your environment.
