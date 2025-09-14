@@ -1,7 +1,3 @@
-# USD Indie Pipeline:
-USD Indie Pipeline is a pipeline setup (in development 😅) 
-The idea is to create a starter kit with clean practices, tools, and just enough flexibility to grow with your projects.
-
 
 # Geo to USD CLI tool:
 
