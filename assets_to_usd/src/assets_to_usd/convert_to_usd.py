@@ -34,10 +34,6 @@ import logging
 import sys
 from pathlib import Path
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-)
 _THIS = Path(__file__)
 
 SRC_ROOT = _THIS.parent.parent
@@ -64,4 +60,8 @@ def main(args: list[str] | None = None):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
     main()
