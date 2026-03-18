@@ -1,12 +1,15 @@
+import logging
 from pathlib import Path
 
 import hou
 
-import _usd
-import _utils
+import asset_mapping
+import usd_material_builder
+
+logger = logging.getLogger(__name__)
 
 
-def create_temp_hou_stage(file_path):
+def create_temp_hou_stage(file_path: Path):
     """
     Creates a temp usd scene in memory to import a geometry file and export usd file
     """
@@ -15,7 +18,7 @@ def create_temp_hou_stage(file_path):
         raise FileNotFoundError(f"Could not find geometry file: {file_path}")
     else:
         # create Sop read
-        print(f"ASSET NAME: {asset_name}")
+        logging.info(f"ASSET NAME: {asset_name}")
         sop_create = hou.node("/stage").createNode("sopcreate", asset_name)
         sop_create.parm("enable_partitionattribs").set(True)
         sop_create.parm("partitionattribs").set("path")
@@ -47,7 +50,7 @@ def create_temp_hou_stage(file_path):
 
         # Execute save usd file
         usd_rop.parm("execute").pressButton()
-        print(f"CONVERTED USD: {str(usd_file)}")
+        logging.info(f"CONVERTED USD: {str(usd_file)}")
 
         return usd_file
 
@@ -79,8 +82,8 @@ def run_geo_to_usd_conversion(asset_lib_path: str, lib_name=None, tex_folder_pat
     If no library name is provided, you can optionally specify a texture folder directly.
     If neither is provided, the tool will default to using the same folder as the geometry file.
     """
-    conv_data = _utils.create_assets_dictionary(asset_lib_path, lib_name, tex_folder_path)
+    conv_data = asset_mapping.create_assets_dictionary(asset_lib_path, lib_name, tex_folder_path)
     for file_path, tex_folder in conv_data.items():
         file_path = Path(file_path)
         usd_file = create_temp_hou_stage(file_path)
-        _usd.run_material_assignment(usd_file, str(tex_folder))
+        usd_material_builder.run_material_assignment(usd_file, str(tex_folder))

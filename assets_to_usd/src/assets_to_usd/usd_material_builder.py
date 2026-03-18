@@ -1,6 +1,10 @@
+import logging
+
 from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf
 
 from assets_to_usd.texture_resolve import TextureResolve
+
+logger = logging.getLogger(__name__)
 
 
 def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: str) -> Usd.Prim:
@@ -146,7 +150,7 @@ def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
         else:
             surface_shader.CreateInput(parm_name, Sdf.ValueTypeNames.Float3).ConnectToSource(uv_tex_output)
 
-        print(f"CREATED TEXTURE {parm_name} : {tex_path}")
+        logging.info(f"CREATED TEXTURE {parm_name} : {tex_path}")
 
     # Connection to materila output
     mat.CreateOutput("mtlx:surface", Sdf.ValueTypeNames.Token).ConnectToSource(surface_shader_output)
@@ -154,4 +158,4 @@ def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
     mat.CreateOutput("surface", Sdf.ValueTypeNames.Token).ConnectToSource(preview_output)
     mat.CreateSurfaceOutput().ConnectToSource(surface_shader_output)
 
-    print(f"MATERIAL POPULATED: {mat_path}")
+    logging.info(f"MATERIAL POPULATED: {mat_path}")

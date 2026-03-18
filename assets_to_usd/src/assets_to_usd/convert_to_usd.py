@@ -30,9 +30,14 @@ Example usage: No texture path or texture library provided
 """
 import argparse
 import importlib
+import logging
 import sys
 from pathlib import Path
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
 _THIS = Path(__file__)
 
 SRC_ROOT = _THIS.parent.parent
@@ -41,7 +46,7 @@ module_path = str(SRC_ROOT)
 if module_path not in sys.path:
     sys.path.append(module_path)
 
-    _hou_ip = importlib.import_module('assets_to_usd._houdini')
+_hou_ip = importlib.import_module('assets_to_usd.hou_stage_builder')
 
 
 def main(args: list[str] | None = None):
@@ -57,7 +62,6 @@ def main(args: list[str] | None = None):
         namespace.textures_folder_path,
     )
 
+
 if __name__ == "__main__":
     main()
-
-
