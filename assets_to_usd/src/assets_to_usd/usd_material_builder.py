@@ -1,20 +1,19 @@
 import logging
 
-from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf
-
 from assets_to_usd.texture_resolve import TextureResolve
+from pxr import Usd, UsdGeom, UsdShade, Kind, Sdf
 
 logger = logging.getLogger(__name__)
 
 
 def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: str) -> Usd.Prim:
     """
-     Creates a material library and assigns materials to geometry.
+    Create materials and bind them to geometry.
 
-    If primitive has subsets for each material name in materials, this function defines a MaterialX, populates it
-    with shader parameters and texture connections, and binds it to the corresponding geometry.
-
-    If subsets are not present, binding is done per-mesh
+    Args:
+        usd_stage: USD file path.
+        materials: Material names.
+        tex_folder_path: Texture folder path.
     """
     stage = Usd.Stage.Open(usd_stage)
     subsets = get_subsets(stage)
@@ -62,7 +61,13 @@ def create_and_bind_materials(usd_stage: str, materials: list, tex_folder_path: 
 
 def get_subsets(stage: Usd.Stage) -> list:
     """
-    Traverses the USD stage and collects all subsets prims.
+    Collect geometry subsets from a stage.
+
+    Args:
+        stage: USD stage.
+
+    Returns:
+        list[Usd.Prim]: Subset prims.
     """
     subsets = []
     for prim in stage.Traverse():
@@ -73,9 +78,17 @@ def get_subsets(stage: Usd.Stage) -> list:
     return subsets
 
 
-def solve_texture(usd_file: str, namespace: str, tex_folder_path: str) -> dict:
+def solve_texture(usd_file: str, namespace: str, tex_folder_path: str) -> dict[str, Path]:
     """
-    Resolves texture file paths using the TextureResolve class.
+    Resolve textures for a given namespace.
+
+    Args:
+        usd_file: USD file path.
+        namespace: Geometry namespace.
+        tex_folder_path: Texture folder path.
+
+    Returns:
+        dict: Texture mapping.
     """
     tex_resolve = TextureResolve(usd_file, namespace, tex_folder_path)
     tex_resolve.geometry_file = usd_file
@@ -87,9 +100,11 @@ def solve_texture(usd_file: str, namespace: str, tex_folder_path: str) -> dict:
 
 def run_material_assignment(usd_file: str, tex_folder_path: str) -> None:
     """
-    Runs material creation and assignment for a USD stage.
-    This function gathers all geometry subsets, determines material names,
-    and calls the material creation and binding pipeline.
+    Run material assignment for a USD stage.
+
+    Args:
+        usd_file: USD file path.
+         tex_folder_path: Texture folder path.
     """
     stage = Usd.Stage.Open(usd_file)
     subc = get_subsets(stage)
@@ -99,14 +114,16 @@ def run_material_assignment(usd_file: str, tex_folder_path: str) -> None:
 
 def populate_mtlx(stage: Usd.Stage, mat: Usd.Prim, parms_mapping: dict) -> None:
     """
-    Populates a materialX surface and displacement shader with default parameters and textures.
-    For each texture entry in the parameter mapping, a UsdUVTexture is created and
-    connected to the corresponding input on either the surface or displacement shader.
-    """
+    Populate MaterialX shaders and connect textures.
 
+    Args:
+        stage: USD stage.
+        mat: Material prim.
+        parms_mapping: Texture mapping.
+    """
     mat_path = mat.GetPath()
 
-    # Init Mtlx standart surface shader
+    # Init Mtlx standard surface shader
     surface_shader = UsdShade.Shader.Define(stage, f"{mat_path}/mtlxstandard_surface")
     surface_shader.CreateIdAttr("ND_standard_surface_surfaceshader")
     surface_shader_output = surface_shader.CreateOutput("out", Sdf.ValueTypeNames.Token)
