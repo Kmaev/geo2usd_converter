@@ -4,22 +4,30 @@ from pathlib import Path
 
 def flatten_input_data(data_str: str) -> str:
     """
-    Removes all non-alphanumeric characters and converts the string to lowercase.
-    Used for matching texture and primitives in usd stage.
+    Normalize a string for matching.
+
+    Args:
+        data_str: Input string.
+
+    Returns:
+        str: Normalized string.
     """
     return re.sub(r'[^a-zA-Z0-9]', '', data_str).lower()
 
 
-def create_assets_dictionary(asset_lib_path: str, lib_name=None, tex_folder_path=None) -> dict:
+def create_assets_dictionary(asset_lib_path: str, lib_name: str | None = None, tex_folder_path: str | None = None) \
+        -> dict[Path, Path]:
     """
-    Builds a dictionary mapping geometry files to their corresponding texture folders.
-    The mapping strategy varies depending on whether a known library type or an explicit texture folder path is provided.
-    Supported cases:
-    - Libraries: "Kitbash", "Megascans"
-    - Matching a folder of assets to a separate texture folder
-    - If neither `lib_name` nor `tex_folder_path` is provided, the geometry file’s folder is used as the texture folder by default.
-    """
+    Build mapping between geometry files and texture folders.
 
+    Args:
+        asset_lib_path: Asset library path.
+        lib_name: Library type (e.g. Kitbash, Megascans).
+        tex_folder_path: Custom texture folder path.
+
+    Returns:
+        dict: Geometry to texture mapping.
+    """
     geo_tex_mapping = {}
     file_formats = ["fbx", "bgeo.sc", "obj"]
     lib_path = Path(asset_lib_path)

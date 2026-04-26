@@ -1,32 +1,19 @@
 """
-Before running the command, make sure USD is installed in your environment.
+Run USD conversion from CLI using hython.
 
-Run the following command: the Hython executable, followed by the path to the convert_usd.py file,
-then add the --asset-lib-path argument, and optionally: --lib-name and --textures-folder-path.
+Requires USD and Houdini environment.
 
-Example usage (Kitbash):
-/Applications/Houdini/Houdini20.5.653/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
-  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/assets_to_usd/src/assets_to_usd/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_ironforge_test_lib/ \
-  --lib-name Kitbash
+Examples:
+Kitbash:
+/Applications/Houdini/.../hython /path/to/convert_to_usd.py --asset-lib-path /path/to/lib --lib-name Kitbash
+Megascans:
+/Applications/Houdini/.../hython /path/to/convert_to_usd.py --asset-lib-path /path/to/lib --lib-name Megascans
 
-Example usage (Megascans):
-/Applications/Houdini/Houdini20.5.653/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
-  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/assets_to_usd/src/assets_to_usd/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/megascans \
-  --lib-name Megascans
+Custom textures:
+/Applications/Houdini/.../hython /path/to/convert_to_usd.py --asset-lib-path /path/to/geo --textures-folder-path /path/to/textures
 
-Example usage: Match geometry and texture folders independently of the library:
-/Applications/Houdini/Houdini20.5.653/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
-  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/assets_to_usd/src/assets_to_usd/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/kb3d_match_by_folders/geo \
-  --textures-folder-path /Users/kmaev/Documents/hou_dev/assets/kb3d_match_by_folders/KB3DTextures/4k
-
-Example usage: No texture path or texture library provided
-(by default, the tool uses the file's folder as the texture folder):
-/Applications/Houdini/Houdini20.5.653/Frameworks/Houdini.framework/Versions/Current/Resources/bin/hython \
-  /Users/kmaev/Documents/hou_dev/usd_indie_pipe/assets_to_usd/src/assets_to_usd/convert_to_usd.py \
-  --asset-lib-path /Users/kmaev/Documents/hou_dev/assets/megascans/japanese_gravestone_ucmmfjgfa_mid
+Default:
+/Applications/Houdini/.../hython /path/to/convert_to_usd.py --asset-lib-path /path/to/assets
 """
 import argparse
 import importlib
@@ -45,7 +32,13 @@ if module_path not in sys.path:
 _hou_ip = importlib.import_module('assets_to_usd.hou_stage_builder')
 
 
-def main(args: list[str] | None = None):
+def main(args: list[str] | None = None) -> None:
+    """
+    Run geometry to USD conversion.
+
+    Args:
+        args: Command-line arguments.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--asset-lib-path", required=True, default=None)
     parser.add_argument("--lib-name", required=False, default=None)

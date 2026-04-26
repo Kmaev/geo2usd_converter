@@ -11,7 +11,13 @@ logger = logging.getLogger(__name__)
 
 def create_temp_hou_stage(file_path: Path):
     """
-    Creates a temp usd scene in memory to import a geometry file and export usd file
+    Create a temporary USD stage and export a USD file.
+
+    Args:
+        file_path: Geometry file path.
+
+    Returns:
+        Path: Generated USD file path.
     """
     asset_name = file_path.name.split(".")[0]
     if not file_path.exists():
@@ -57,8 +63,14 @@ def create_temp_hou_stage(file_path: Path):
 
 def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) -> str:
     """
-    Construct the output .usda path from a geometry file path.
-    If separate_usd_folder is True, usd files will be put into usd subfolder.
+    Build USD file path from a geometry file.
+
+    Args:
+        geo_path: Geometry file path.
+        separate_usd_folder: Store USD in subfolder.
+
+    Returns:
+        str: USD file path.
     """
     clean_base = geo_path.name.split(".")[0]
     usd_file_name = clean_base + ".usd"
@@ -74,13 +86,12 @@ def construct_usd_file_path(geo_path: Path, separate_usd_folder: bool = True) ->
 
 def run_geo_to_usd_conversion(asset_lib_path: str, lib_name=None, tex_folder_path=None) -> None:
     """
-    Runs geometry-to-usd conversion for all assets found in the given asset library path.
+    Run geometry to USD conversion for an asset library.
 
-    If a library name is provided, the texture folder will be automatically resolved based on
-    the expected folder structure of the specified library (currently supports Kitbash and Megascans).
-
-    If no library name is provided, you can optionally specify a texture folder directly.
-    If neither is provided, the tool will default to using the same folder as the geometry file.
+    Args:
+        asset_lib_path: Asset library path.
+        lib_name: Library type (e.g. Kitbash, Megascans).
+        tex_folder_path: Custom texture folder path.
     """
     conv_data = asset_mapping.create_assets_dictionary(asset_lib_path, lib_name, tex_folder_path)
     for file_path, tex_folder in conv_data.items():

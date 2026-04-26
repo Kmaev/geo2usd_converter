@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from assets_to_usd.asset_mapping import flatten_input_data
+from assets_to_usd import asset_mapping
 
 
 @dataclass
 class TextureResolve:
+    """Resolve textures for a geometry asset."""
     geometry_file: str
     tex_folder_path: str = None
     namespace: str = ""
@@ -20,9 +21,14 @@ class TextureResolve:
     })
     mapping: dict[str, Path] = field(default_factory=dict)
 
-    def parse_texture(self) -> dict:
-        # we remove the first few characters because it comes with prefix
-        name_space_clean = flatten_input_data(self.namespace)
+    def parse_texture(self) -> dict[str, Path]:
+        """
+          Build texture mapping from folder.
+
+          Returns:
+              dict: Texture mapping.
+          """
+        name_space_clean = asset_mapping.flatten_input_data(self.namespace)
         name_space_edit = name_space_clean[5:] if len(name_space_clean) > 5 else name_space_clean
 
         tex_folder_abs_path = Path(self.tex_folder_path)
